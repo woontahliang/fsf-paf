@@ -30,7 +30,8 @@ var makeQuery = (sql, pool) => {
                     reject(err);
                     return;
                 }
-                console.log(args);
+                console.log("args: ", args);
+                console.log("args is true or false: ", args ? "Is true" : "Is false");
 
                 connection.query(sql, args || [], (err, results) => {
                     connection.release();
@@ -48,8 +49,8 @@ var makeQuery = (sql, pool) => {
 }
 
 // Step 5: Define SQL.
-const sqlGetAllRsvps = "SELECT email, given_name, phone, attending, remarks FROM birthday";
-const sqlAddOneRsvp = "INSERT INTO birthday ( email, given_name, phone, attending, remarks ) VALUES ( ? , ? , ? , ? , ? )";
+const sqlGetAllRsvps = "SELECT email, given_name, phone, attending, remarks FROM rsvp";
+const sqlAddOneRsvp = "INSERT INTO rsvp ( email, given_name, phone, attending, remarks ) VALUES ( ? , ? , ? , ? , ? )";
 
 // Step 6: Define call backs.
 var getAllRsvps = makeQuery(sqlGetAllRsvps, pool);
