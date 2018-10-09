@@ -20,18 +20,18 @@ var pool = mysql.createPool({
 });
 
 // Step 4: Define closures.
-var makeQuery = (sql, pool) => {
+const makeQuery = function (sql, pool) {
     console.log("makeQuery SQL: ", sql);
 
-    return (args) => {
-        let queryPromise = new Promise((resolve, reject) => {
+    return function (args) {
+        return new Promise((resolve, reject) => {
             pool.getConnection((err, connection) => {
                 if (err) {
                     reject(err);
                     return;
                 }
-                console.log("args: ", args);
-                console.log("args is true or false: ", args ? "Is true" : "Is false");
+                console.log("makeQuery args: ", args);
+                console.log("makeQuery args is true or false: ", args ? "Is true" : "Is false");
 
                 connection.query(sql, args || [], (err, results) => {
                     connection.release();
@@ -44,7 +44,6 @@ var makeQuery = (sql, pool) => {
                 });
             });
         });
-        return queryPromise;
     }
 }
 
@@ -88,28 +87,18 @@ app.post(API_URI + "/rsvp", bodyParser.urlencoded({ extended: true }), bodyParse
     let phoneValue = null;
     let attendingValue = null;
     let remarksValue = null;
-    if (req.is('application/json')) {
+    if (req.is('application/json') || req.is('application/x-www-form-urlencoded')) {
+        console.log(req.get('content-type'));
+        console.log('req.body.email: ', req.body.email);
+        console.log('req.body.given_name: ', req.body.given_name);
+        console.log('req.body.phone: ', req.body.phone);
+        console.log('req.body.attending: ', req.body.attending);
+        console.log('req.body.remarks: ', req.body.remarks);
         emailValue = req.body.email;
         given_nameValue = req.body.given_name;
         phoneValue = req.body.phone;
         attendingValue = req.body.attending;
         remarksValue = req.body.remarks;
-        console.log('application/json, emailValue: ', emailValue);
-        console.log('application/json, given_nameValue: ', given_nameValue);
-        console.log('application/json, phoneValue: ', phoneValue);
-        console.log('application/json, attendingValue: ', attendingValue);
-        console.log('application/json, remarksValue: ', remarksValue);
-    } else if (req.is('application/x-www-form-urlencoded')) {
-        emailValue = req.body.email;
-        given_nameValue = req.body.given_name;
-        phoneValue = req.body.phone;
-        attendingValue = req.body.attending;
-        remarksValue = req.body.remarks;
-        console.log('application/x-www-form-urlencoded, emailValue: ', emailValue);
-        console.log('application/x-www-form-urlencoded, given_nameValue: ', given_nameValue);
-        console.log('application/x-www-form-urlencoded, phoneValue: ', phoneValue);
-        console.log('application/x-www-form-urlencoded, attendingValue: ', attendingValue);
-        console.log('application/x-www-form-urlencoded, remarksValue: ', remarksValue);
     } else {
         res.status(400).json({ error: `Unable to service ${req.get('content-type')}`, status: 'error' });
         return;
@@ -122,7 +111,6 @@ app.post(API_URI + "/rsvp", bodyParser.urlencoded({ extended: true }), bodyParse
                 res.status(200).json({ status: 'success' });
             },
             'default': () => {
-                // log the request and respond with 406
                 res.status(406).send('Not Acceptable');
             }
         });
@@ -143,6 +131,13 @@ app.use((req, resp) => {
 // Step 8: Start the server.
 const PORT = parseInt(process.argv[2]) || parseInt(process.env.APP_PORT) || 3000;
 
-app.listen(PORT, () => {
-    console.info(`Application started on port ${PORT}`);
-});
+pool.getConnection((err, conn) => {
+    if (err) {
+        console.error('ERROR: ', err);
+        process.exit(-1);
+    }
+    conn.release();
+    app.listen(PORT, () => {
+        console.info('Application started on port %d at %s', PORT, new Date());
+    });
+})
