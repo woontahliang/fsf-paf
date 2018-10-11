@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { Rsvp } from '../../models/rsvp.interface';
+import { IRsvp } from '../../models/irsvp.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ export class RsvpService {
 
   constructor(private http: HttpClient) { }
 
-  addRsvp(info: Rsvp): Promise<boolean> {
+  addRsvp(info: IRsvp): Promise<boolean> {
     const formData = new HttpParams()
       .set('email', info.email)
       .set('given_name', info.given_name)

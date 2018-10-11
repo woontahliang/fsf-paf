@@ -1,3 +1,57 @@
-<p>
-  add-rsvp-form works!
-</p>
+<form #myForm="ngForm" (ngSubmit)="processForm(myForm)" fxLayout="column" fxLayoutGap="10px">
+  <mat-form-field>
+    <input type="email" placeholder="Email" #emailField="ngModel" pattern='^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$'
+      name="email" matInput required ngModel>
+    <mat-hint>Eg. tanahteck@email.com</mat-hint>
+    <mat-error *ngIf="emailField.hasError('required') && myForm.touched">
+      You must enter an email!
+    </mat-error>
+    <mat-error *ngIf="emailField.hasError('pattern') && myForm.touched">
+      Please enter a valid email!
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <input type="text" placeholder="Given Name" #given_nameField="ngModel" name="given_name" matInput required ngModel>
+    <mat-hint>Eg. tanahteck</mat-hint>
+    <mat-error *ngIf="given_nameField.hasError('required') && myForm.touched">
+      You must enter a user name!
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <input type="text" placeholder="Contact Number" #phoneField="ngModel" name="phone" matInput required ngModel>
+    <mat-hint>Eg. 91234567</mat-hint>
+    <mat-error *ngIf="phoneField.hasError('required') && myForm.touched">
+      You must enter a contact number!
+    </mat-error>
+    <mat-error *ngIf="phoneField.hasError('pattern') && myForm.touched">
+      Your contact must fulfill the requirement!
+    </mat-error>
+  </mat-form-field>
+
+  <mat-list>
+    <label>Attending</label><br>
+    <mat-radio-group #attendingField="ngModel" name="attending" placeholder="Attending" required ngModel>
+      <mat-radio-button value="yes">Yes</mat-radio-button>
+      <mat-radio-button value="no">No</mat-radio-button>
+    </mat-radio-group>
+  </mat-list>
+
+  <mat-form-field>
+    <textarea matInput placeholder="Remarks" #remarksField="ngModel" name="remarks" ngModel></textarea>
+    <mat-hint>Enter your remarks</mat-hint>
+  </mat-form-field>
+
+  <br>
+  <br>
+
+  <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="8px">
+    <button type="reset" mat-button mat-raised-button color="primary">
+      <mat-icon>clear</mat-icon> Clear
+    </button>
+    <button type="submit" mat-button mat-raised-button color="primary" [disabled]="myForm.invalid">
+      <mat-icon>check</mat-icon> Submit
+    </button>
+  </div>
+</form>

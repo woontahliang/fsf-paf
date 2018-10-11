@@ -12,6 +12,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
+import { MatListModule } from '@angular/material/list';
 
 import { FlexLayoutModule } from '@angular/flex-layout';
 
@@ -28,6 +29,7 @@ const MODULES = [
   MatDatepickerModule,
   MatSelectModule,
   MatTableModule,
+  MatListModule,
   FlexLayoutModule
 ];
 

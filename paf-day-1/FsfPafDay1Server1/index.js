@@ -5,6 +5,7 @@ const mysql = require("mysql");
 const path = require('path');
 const bodyParser = require("body-parser");
 const dbconfig = require('./dbconfig');
+const utils = require('./libs/mysql_utils');
 
 // Step 2: Create an instance of the application.
 var app = express();
@@ -14,40 +15,14 @@ console.log(dbconfig);
 var pool = mysql.createPool(dbconfig);
 
 // Step 4: Define closures.
-const makeQuery = function (sql, pool) {
-    console.log("makeQuery SQL: ", sql);
-
-    return function (args) {
-        return new Promise((resolve, reject) => {
-            pool.getConnection((err, connection) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                console.log("makeQuery args: ", args);
-                console.log("makeQuery args is true or false: ", args ? "Is true" : "Is false");
-
-                connection.query(sql, args || [], (err, results) => {
-                    connection.release();
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    console.log(">>> " + results);
-                    resolve(results);
-                });
-            });
-        });
-    }
-}
 
 // Step 5: Define SQL.
 const sqlGetAllRsvps = "SELECT email, given_name, phone, attending, remarks FROM rsvp";
 const sqlAddOneRsvp = "INSERT INTO rsvp ( email, given_name, phone, attending, remarks ) VALUES ( ? , ? , ? , ? , ? )";
 
 // Step 6: Define call backs.
-var getAllRsvps = makeQuery(sqlGetAllRsvps, pool);
-var addOneRsvp = makeQuery(sqlAddOneRsvp, pool);
+var getAllRsvps = utils.makeQuery(sqlGetAllRsvps, pool);
+var addOneRsvp = utils.makeQuery(sqlAddOneRsvp, pool);
 
 // Step 7: Define routes.
 const API_URI = "/api";
@@ -82,7 +57,7 @@ app.post(API_URI + "/rsvp", bodyParser.urlencoded({ extended: true }), bodyParse
     let attendingValue = null;
     let remarksValue = null;
     if (req.is('application/json') || req.is('application/x-www-form-urlencoded')) {
-        console.log(req.get('content-type'));
+        console.log('\'content-type\':', req.get('content-type'));
         console.log('req.body.email: ', req.body.email);
         console.log('req.body.given_name: ', req.body.given_name);
         console.log('req.body.phone: ', req.body.phone);
