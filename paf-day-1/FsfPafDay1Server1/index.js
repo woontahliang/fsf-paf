@@ -4,20 +4,14 @@ const express = require("express");
 const mysql = require("mysql");
 const path = require('path');
 const bodyParser = require("body-parser");
+const dbconfig = require('./dbconfig');
 
 // Step 2: Create an instance of the application.
 var app = express();
 
 // Step 3: Setup Database connection.
-var pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    connectionLimit: process.env.DB_CONLIMIT,
-    debug: true
-});
+console.log(dbconfig);
+var pool = mysql.createPool(dbconfig);
 
 // Step 4: Define closures.
 const makeQuery = function (sql, pool) {
@@ -81,7 +75,7 @@ app.get(API_URI + "/rsvps", (req, res) => {
 app.post(API_URI + "/rsvp", bodyParser.urlencoded({ extended: true }), bodyParser.json(), (req, res) => {
     console.log("POST /rsvp");
 
-    console.log("req: ", req.body);
+    console.log("req.body: ", req.body);
     let emailValue = null;
     let given_nameValue = null;
     let phoneValue = null;
@@ -129,14 +123,13 @@ app.use((req, resp) => {
 });
 
 // Step 8: Start the server.
-const PORT = parseInt(process.argv[2]) || parseInt(process.env.APP_PORT) || 3000;
-
 pool.getConnection((err, conn) => {
     if (err) {
         console.error('ERROR: ', err);
         process.exit(-1);
     }
     conn.release();
+    const PORT = parseInt(process.argv[2]) || parseInt(process.env.APP_PORT) || 3000;
     app.listen(PORT, () => {
         console.info('Application started on port %d at %s', PORT, new Date());
     });
